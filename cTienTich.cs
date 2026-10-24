@@ -1,33 +1,91 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Drawing;
 
 namespace Game3
 {
     public class cTienTich
     {
+        /// <summary>
+        /// Nạp ảnh an toàn trực tiếp vào PictureBox (Có ảnh thay thế nếu mất file)
+        /// </summary>
         public static void LoadAnhAnToan(PictureBox picBox, string duongDanAnh)
         {
+            if (picBox == null) return;
+
             try
             {
-                picBox.Image = Image.FromFile(duongDanAnh);
-           
+                if (string.IsNullOrWhiteSpace(duongDanAnh) || !File.Exists(duongDanAnh))
+                {
+                    Console.WriteLine($"Không tìm thấy file ảnh: {duongDanAnh}");
+                    picBox.Image = TaoAnhMacDinh(picBox.Width, picBox.Height);
+                    return;
+                }
+
+                // Giải phóng ảnh cũ (nếu có) để tránh tràn RAM
+                if (picBox.Image != null)
+                {
+                    picBox.Image.Dispose();
+                    picBox.Image = null;
+                }
+
+                // Đọc qua FileStream để không bị khóa (lock) file ảnh trên ổ cứng
+                using (FileStream fs = new FileStream(duongDanAnh, FileMode.Open, FileAccess.Read))
+                {
+                    picBox.Image = Image.FromStream(fs);
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Lỗi load ảnh tại {duongDanAnh}: {ex.Message}");
-                picBox.Image = null;
+                picBox.Image = TaoAnhMacDinh(picBox.Width, picBox.Height);
             }
         }
+
+        /// <summary>
+        /// Nạp và trả về đối tượng Image an toàn (Dùng cho Form.BackgroundImage, Button, v.v.)
+        /// </summary>
+        public static Image LoadAnhAnToan(string duongDanAnh)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(duongDanAnh) || !File.Exists(duongDanAnh))
+                {
+                    Console.WriteLine($"Không tìm thấy file ảnh: {duongDanAnh}");
+                    return TaoAnhMacDinh(100, 100);
+                }
+
+                using (FileStream fs = new FileStream(duongDanAnh, FileMode.Open, FileAccess.Read))
+                {
+                    return Image.FromStream(fs);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi load ảnh tại {duongDanAnh}: {ex.Message}");
+                return TaoAnhMacDinh(100, 100);
+            }
+        }
+
+        /// <summary>
+        /// Phát âm thanh (.wav) an toàn, không làm văng game nếu mất file âm thanh
+        /// </summary>
         public static void PhatAmThanhAnToan(string duongDanAmThanh)
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(duongDanAmThanh) || !File.Exists(duongDanAmThanh))
+                {
+                    Console.WriteLine($"Không tìm thấy file âm thanh: {duongDanAmThanh}");
+                    return;
+                }
+
                 using (SoundPlayer player = new SoundPlayer(duongDanAmThanh))
                 {
                     player.Play();
@@ -35,7 +93,44 @@ namespace Game3
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Lỗi load âm thanh tại {duongDanAmThanh}: {ex.Message}");
+                Console.WriteLine($"Lỗi phát âm thanh tại {duongDanAmThanh}: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Tạo một hình ảnh mặc định khi file ảnh gốc bị mất để giao diện không bị trống
+        /// </summary>
+        private static Image TaoAnhMacDinh(int width, int height)
+        {
+            try
+            {
+                int w = Math.Max(width, 60);
+                int h = Math.Max(height, 60);
+                Bitmap bmp = new Bitmap(w, h);
+
+                using (Graphics g = Graphics.FromImage(bmp))
+                {
+                    g.Clear(Color.FromArgb(226, 232, 240)); // Nền xám nhạt
+                    using (Pen pen = new Pen(Color.FromArgb(148, 163, 184), 2))
+                    {
+                        g.DrawRectangle(pen, 1, 1, w - 2, h - 2);
+                    }
+                    using (Font font = new Font("Segoe UI", 9F, FontStyle.Bold))
+                    using (Brush brush = new SolidBrush(Color.FromArgb(100, 116, 139)))
+                    {
+                        StringFormat sf = new StringFormat
+                        {
+                            Alignment = StringAlignment.Center,
+                            LineAlignment = StringAlignment.Center
+                        };
+                        g.DrawString("No Image", font, brush, new RectangleF(0, 0, w, h), sf);
+                    }
+                }
+                return bmp;
+            }
+            catch
+            {
+                return null;
             }
         }
     }
