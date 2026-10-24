@@ -12,9 +12,6 @@ namespace Game3
 {
     public class cTienTich
     {
-        /// <summary>
-        /// Nạp ảnh an toàn trực tiếp vào PictureBox (Có ảnh thay thế nếu mất file)
-        /// </summary>
         public static void LoadAnhAnToan(PictureBox picBox, string duongDanAnh)
         {
             if (picBox == null) return;
@@ -28,14 +25,12 @@ namespace Game3
                     return;
                 }
 
-                // Giải phóng ảnh cũ (nếu có) để tránh tràn RAM
                 if (picBox.Image != null)
                 {
                     picBox.Image.Dispose();
                     picBox.Image = null;
                 }
 
-                // Đọc qua FileStream để không bị khóa (lock) file ảnh trên ổ cứng
                 using (FileStream fs = new FileStream(duongDanAnh, FileMode.Open, FileAccess.Read))
                 {
                     picBox.Image = Image.FromStream(fs);
@@ -48,9 +43,6 @@ namespace Game3
             }
         }
 
-        /// <summary>
-        /// Nạp và trả về đối tượng Image an toàn (Dùng cho Form.BackgroundImage, Button, v.v.)
-        /// </summary>
         public static Image LoadAnhAnToan(string duongDanAnh)
         {
             try
@@ -73,9 +65,6 @@ namespace Game3
             }
         }
 
-        /// <summary>
-        /// Phát âm thanh (.wav) an toàn, không làm văng game nếu mất file âm thanh
-        /// </summary>
         public static void PhatAmThanhAnToan(string duongDanAmThanh)
         {
             try
@@ -97,9 +86,7 @@ namespace Game3
             }
         }
 
-        /// <summary>
-        /// Tạo một hình ảnh mặc định khi file ảnh gốc bị mất để giao diện không bị trống
-        /// </summary>
+        
         private static Image TaoAnhMacDinh(int width, int height)
         {
             try

@@ -22,7 +22,7 @@ namespace Game3
             {
                 KhoiTaoCotDataGridView();
                 TaiVaHienThiDuLieu();
-                cboLocCapDo.SelectedIndex = 0; // Mặc định chọn "Tất cả"
+                cboLocCapDo.SelectedIndex = 0; 
             }
             catch (Exception ex)
             {
@@ -40,14 +40,12 @@ namespace Game3
             dgvThanhTich.Columns[3].Name = "Thời Gian";
             dgvThanhTich.Columns[4].Name = "Ngày Chơi";
 
-            // Tỉ lệ độ rộng các cột cho cân đối
             dgvThanhTich.Columns[0].FillWeight = 14;
             dgvThanhTich.Columns[1].FillWeight = 30;
             dgvThanhTich.Columns[2].FillWeight = 18;
             dgvThanhTich.Columns[3].FillWeight = 16;
             dgvThanhTich.Columns[4].FillWeight = 22;
 
-            // Tắt sort tự động khi bấm vào tiêu đề cột để không làm乱 thứ tự xếp hạng chuẩn
             foreach (DataGridViewColumn col in dgvThanhTich.Columns)
             {
                 col.SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -84,7 +82,6 @@ namespace Game3
                     string thoiGianHienThi = $"{phut:D2}:{giay:D2}";
                     string ngayHienThi = tt.NgayChoi.ToString("dd/MM/yyyy HH:mm");
 
-                    // Biểu tượng huy chương cho Top 1, 2, 3
                     string hangHienThi;
                     if (i == 0) hangHienThi = "🥇 #1";
                     else if (i == 1) hangHienThi = "🥈 #2";
@@ -99,21 +96,20 @@ namespace Game3
                         ngayHienThi
                     );
 
-                    // Tô màu nổi bật cho Top 3
                     DataGridViewRow row = dgvThanhTich.Rows[rowIndex];
                     if (i == 0)
                     {
-                        row.DefaultCellStyle.BackColor = Color.FromArgb(254, 249, 195); // Vàng nhạt (Gold)
+                        row.DefaultCellStyle.BackColor = Color.FromArgb(254, 249, 195); 
                         row.DefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
                     }
                     else if (i == 1)
                     {
-                        row.DefaultCellStyle.BackColor = Color.FromArgb(226, 232, 240); // Bạc nhạt (Silver)
+                        row.DefaultCellStyle.BackColor = Color.FromArgb(226, 232, 240); 
                         row.DefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
                     }
                     else if (i == 2)
                     {
-                        row.DefaultCellStyle.BackColor = Color.FromArgb(254, 215, 170); // Đồng nhạt (Bronze)
+                        row.DefaultCellStyle.BackColor = Color.FromArgb(254, 215, 170); 
                         row.DefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
                     }
                 }
@@ -126,8 +122,6 @@ namespace Game3
                 Console.WriteLine("Lỗi hiển thị bảng: " + ex.Message);
             }
         }
-
-        // Sự kiện lọc theo cấp độ
         private void cboLocCapDo_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
@@ -153,7 +147,6 @@ namespace Game3
             }
         }
 
-        // Sự kiện xóa lịch sử thành tích (có bọc Try...Catch)
         private void btnXoaLichSu_Click(object sender, EventArgs e)
         {
             try
@@ -181,7 +174,6 @@ namespace Game3
             }
         }
 
-        // Sự kiện nút Đóng
         private void btnDong_Click(object sender, EventArgs e)
         {
             this.Close();
